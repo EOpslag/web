@@ -39,10 +39,14 @@ jobs:
           yarn -s tsc -b
           yarn -s lint
 
-      - name: Build
+      # Pages reports http:// until the HTTPS certificate exists; canonical/OG/sitemap must always be https.
+      # A repository variable SITE_URL (Settings → Variables) overrides the Pages-reported URL.
+      - name: Resolve site URL
         env:
-          # Override with a repository variable (Settings → Variables) if the canonical URL differs.
-          SITE_URL: ${{ vars.SITE_URL || steps.pages.outputs.base_url }}
+          RAW_URL: ${{ vars.SITE_URL || steps.pages.outputs.base_url }}
+        run: echo "SITE_URL=${RAW_URL/#http:\/\//https://}" >> "$GITHUB_ENV"
+
+      - name: Build
         run: yarn -s build
 
       # Fails the pipeline on unfilled legal placeholders, forbidden third-party hosts, missing CSP, etc.
