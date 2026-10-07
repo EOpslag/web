@@ -5,6 +5,7 @@ import brandingExteriorImg from '@/assets/images/branding-exterior.png';
 import unitFrontImg from '@/assets/images/unit-front.jpg';
 import interiorWideImg from '@/assets/images/interior-wide.jpg';
 import teamImg from '@/assets/images/team.jpg';
+import { TOTAL_UNITS, getUnitAvailability } from '@/lib/availability';
 
 // three.js + react-three-fiber are ~1 MB: load the 3D box only when the hero renders it, in its own chunk.
 const BoxViewer3D = lazy(() => import('./BoxViewer3D'));
@@ -146,13 +147,8 @@ const Spinner = () => <svg style={{
     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="31.4" strokeDashoffset="10" strokeLinecap="round" />
   </svg>;
 const PURCHASE_PRICE = 34000;
-const LAUNCH_DATE = new Date('2026-09-07T00:00:00Z');
 const PAGE_LOADED_AT = Date.now();
 const EXIT_INTENT_MIN_DWELL_MS = 30 * 1000;
-const TOTAL_UNITS = 40;
-const INITIAL_SOLD = 9;
-const WEEKLY_DECREASE = 2;
-const MIN_AVAILABLE = 3;
 const HERO_USPS = [{
   id: 'ruimte',
   label: '47.6m³ ruimte, 3.4m hoog'
@@ -2681,14 +2677,7 @@ export const ExtraOpslagLanding = () => {
   const {
     soldUnits,
     availableUnits
-  } = useMemo(() => {
-    const weeksSinceLaunch = Math.floor((Date.now() - LAUNCH_DATE.getTime()) / (7 * 24 * 60 * 60 * 1000));
-    const calculatedSoldUnits = Math.min(INITIAL_SOLD + weeksSinceLaunch * WEEKLY_DECREASE, TOTAL_UNITS - MIN_AVAILABLE);
-    return {
-      soldUnits: calculatedSoldUnits,
-      availableUnits: TOTAL_UNITS - calculatedSoldUnits
-    };
-  }, []);
+  } = useMemo(() => getUnitAvailability(), []);
   const defaultUrgencyMessage = `LIVE: Nog ${availableUnits} units beschikbaar`;
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [modalUrgencyMessage, setModalUrgencyMessage] = useState(defaultUrgencyMessage);

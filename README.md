@@ -81,8 +81,8 @@ Iedereen die de site bekijkt kan ze zien, dus de bescherming zit in uw dashboard
   binnenkort volgen; plaats daar de echte tekst (of een link naar een PDF). De privacyverklaring noemt geen
   rechtspersoon, e-mailprovider of vaste bewaartermijn — vul die aan zodra u ze heeft (art. 13 AVG: wie, aan wie, hoe lang).
   De akkoord-checkbox verwijst al naar de voorwaarden.
-- De site toont een “LIVE”-beschikbaarheidsteller die automatisch afneemt (2 units/week vanaf 7 september 2026,
-  zie `LAUNCH_DATE`/`WEEKLY_DECREASE` in `ExtraOpslagLanding.tsx`), een score “4.9/5 op basis van 47 beoordelingen”,
+- De site toont een “LIVE”-beschikbaarheidsteller die automatisch afneemt: nu 36 van 40 beschikbaar, daarna 2 units
+  minder per volledige week na 12 oktober 2026 (eerste stap 19 oktober; zie `src/lib/availability.ts`), een score “4.9/5 op basis van 47 beoordelingen”,
   “47 eigenaren” en vier eigenaarsreviews. Zijn dit geen werkelijke, controleerbare aantallen/reviews, dan zijn het in
   NL/EU misleidende handelspraktijken (Wet handhaving consumentenbescherming / UCPD, ACM-toezicht).
 - Rendementsclaims (6–8%) staan als “indicatief” met disclaimer; richt ze zo in dat ze aantoonbaar onderbouwd zijn.
