@@ -32,14 +32,8 @@ repository-variabele `SITE_URL`. Lokaal staat de standaard op `https://extraopsl
 
 ### Launch-gate (bewust streng)
 
-De pipeline draait `node scripts/check-launch.mjs --strict` en **faalt zolang er placeholders openstaan**:
-
-| Bestand | Placeholder |
-| --- | --- |
-| `public/privacybeleid.html` | `[[BEDRIJFSNAAM]]`, `[[E-MAILPROVIDER]]`, `[[BEWAARTERMIJN]]` |
-| `public/algemene-voorwaarden.html` | `[[ALGEMENE-VOORWAARDEN: …]]` (tekst of link naar PDF) |
-
-Vul die in en push — dan deployt de site. De gate controleert ook: geen verboden externe hosts (CDN's, Google Fonts),
+De pipeline draait `node scripts/check-launch.mjs --strict` en **faalt zodra er een placeholder (`[[…]]`, `XXXXXXXX`) in de
+build staat**, zodat onvolledige juridische tekst nooit per ongeluk live gaat. De gate controleert ook: geen verboden externe hosts (CDN's, Google Fonts),
 CSP aanwezig, canonical/`lang="nl"`, robots/sitemap/404.
 
 ## Beveiliging — wat er is ingebouwd
@@ -83,6 +77,10 @@ Iedereen die de site bekijkt kan ze zien, dus de bescherming zit in uw dashboard
 
 ## Inhoud / juridisch — let op
 
+- **Te vervangen tijdelijke tekst:** `public/algemene-voorwaarden.html` bevat nu alleen een korte mededeling dat de voorwaarden
+  binnenkort volgen; plaats daar de echte tekst (of een link naar een PDF). De privacyverklaring noemt geen
+  rechtspersoon, e-mailprovider of vaste bewaartermijn — vul die aan zodra u ze heeft (art. 13 AVG: wie, aan wie, hoe lang).
+  De akkoord-checkbox verwijst al naar de voorwaarden.
 - De site toont een “LIVE”-beschikbaarheidsteller die automatisch afneemt (2 units/week vanaf 7 september 2026,
   zie `LAUNCH_DATE`/`WEEKLY_DECREASE` in `ExtraOpslagLanding.tsx`), een score “4.9/5 op basis van 47 beoordelingen”,
   “47 eigenaren” en vier eigenaarsreviews. Zijn dit geen werkelijke, controleerbare aantallen/reviews, dan zijn het in
