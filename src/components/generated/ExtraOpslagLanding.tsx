@@ -4,7 +4,6 @@ import { Lock, Clock, Star, Check, CheckCircle, Phone, ChevronDown, Package, Hom
 import brandingExteriorImg from '@/assets/images/branding-exterior.png';
 import unitFrontImg from '@/assets/images/unit-front.jpg';
 import interiorWideImg from '@/assets/images/interior-wide.jpg';
-import unitInteriorAngleImg from '@/assets/images/unit-interior-angle.jpg';
 import teamImg from '@/assets/images/team.jpg';
 
 // three.js + react-three-fiber are ~1 MB: load the 3D box only when the hero renders it, in its own chunk.
@@ -148,6 +147,8 @@ const Spinner = () => <svg style={{
   </svg>;
 const PURCHASE_PRICE = 34000;
 const LAUNCH_DATE = new Date('2026-09-07T00:00:00Z');
+const PAGE_LOADED_AT = Date.now();
+const EXIT_INTENT_MIN_DWELL_MS = 30 * 1000;
 const TOTAL_UNITS = 40;
 const INITIAL_SOLD = 9;
 const WEEKLY_DECREASE = 2;
@@ -641,12 +642,6 @@ const FACILITY_GALLERY_ITEMS: FacilityGalleryItem[] = [{
   imageUrl: interiorWideImg,
   alt: 'Ruim interieur van de ExtraOpslag opslagbox',
   objectPosition: 'center top'
-}, {
-  id: 'unit-interior-angle',
-  label: 'Eigen ingang met rolluikdeur',
-  imageUrl: unitInteriorAngleImg,
-  alt: 'Eigen ingang met rolluikdeur in opslagbox',
-  objectPosition: 'center center'
 }];
 const inputClass = 'dark-purchase-input bg-[#0F1117] text-white border border-white/10 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 rounded-xl px-4 py-3 w-full transition-all outline-none placeholder:text-gray-500';
 const PurchaseModal = ({
@@ -1640,9 +1635,6 @@ const Pricing = ({
           <p className="font-medium text-lg text-gray-300">Of bel direct: <a href="tel:+31297548633" className="text-orange-500 font-bold hover:text-orange-400 transition-colors">0297 548 633</a></p>
           <p className="text-sm">Vrij gesprek, geen verplichtingen</p>
         </div>
-      </div>
-      <div className="mt-8 text-white font-bold text-xl drop-shadow-md bg-black/20 inline-block px-6 py-3 rounded-full backdrop-blur-md">
-        Aanbieding geldig tot: <span className="text-yellow-300">03 dagen 12:45:00</span>
       </div>
     </div>
   </section>;
@@ -2713,25 +2705,30 @@ export const ExtraOpslagLanding = () => {
     telefoon: '',
     type: ''
   });
-  const markModalShown = () => window.sessionStorage.setItem('modal_shown', 'true');
+  const markModalShown = () => {
+    try {
+      window.sessionStorage.setItem('modal_shown', 'true');
+    } catch {
+      /* storage unavailable — the modal may simply be offered again */
+    }
+  };
+  const wasModalShown = () => {
+    try {
+      return window.sessionStorage.getItem('modal_shown') !== null;
+    } catch {
+      return false;
+    }
+  };
   const openPurchaseModal = (urgencyMessage = defaultUrgencyMessage) => {
     setModalUrgencyMessage(urgencyMessage);
     markModalShown();
     setIsPurchaseModalOpen(true);
   };
-  useEffect(() => {
-    const storageKey = 'modal_shown';
-    if (window.sessionStorage.getItem(storageKey)) {
-      return undefined;
-    }
-    const timer = window.setTimeout(() => {
-      openPurchaseModal();
-    }, 8000);
-    return () => window.clearTimeout(timer);
-  }, []);
+  // The page always shows first: there is no timed pop-up. The modal opens when a visitor clicks a buy button,
+  // or (once per session) when they head for the exit after having spent a while on the page.
   useEffect(() => {
     const handleExitIntent = (event: MouseEvent) => {
-      if (event.clientY > 8 || window.sessionStorage.getItem('modal_shown') || isPurchaseModalOpen) {
+      if (event.clientY > 8 || wasModalShown() || isPurchaseModalOpen || Date.now() - PAGE_LOADED_AT < EXIT_INTENT_MIN_DWELL_MS) {
         return;
       }
       openPurchaseModal(`Wacht! Mis uw unit niet, nog ${availableUnits} units beschikbaar`);
